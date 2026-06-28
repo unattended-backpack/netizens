@@ -50,6 +50,7 @@
 .bridge__grid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
+  align-content: start; /* pack rows at the top so a lone card keeps its natural height (no full-height stretch) */
   gap: 1ch;
   height: 360px; /* fixed so the panel never resizes as holdings load */
   overflow-y: auto;

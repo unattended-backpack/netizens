@@ -60,7 +60,7 @@ deploy-l1: require-l1-rpc
 deploy-l2: require-l2-rpc
 	@echo "Deploying NetizenBridgeL2 to L2 ..."
 	cd contracts && forge script script/DeployL2.s.sol:DeployL2 \
-		--rpc-url $(L2_RPC) --broadcast
+		--rpc-url $(L2_RPC) --broadcast --gas-estimate-multiplier 10000
 	@echo "Deploy complete."
 
 .PHONY: wire-l1

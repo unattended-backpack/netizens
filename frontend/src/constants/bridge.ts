@@ -34,7 +34,7 @@ export const L2_CHAIN_ID = Number(envStr('VITE_L2_CHAIN_ID', '4326'));
 export const L1_CHAIN_ID = Number(envStr('VITE_L1_CHAIN_ID', String(mainnet.id)));
 export const KAILUA_GAME_TYPE = Number(envStr('VITE_KAILUA_GAME_TYPE', '1337'));
 
-export const L1_RPC_URL = envStr('VITE_L1_RPC_URL', envStr('VITE_RPC_URL', 'https://eth.llamarpc.com'));
+export const L1_RPC_URL = envStr('VITE_L1_RPC_URL', envStr('VITE_RPC_URL', 'https://ethereum-rpc.publicnode.com'));
 export const L2_RPC_URL = envStr('VITE_L2_RPC_URL', 'https://mainnet.megaeth.com/rpc');
 
 /**
