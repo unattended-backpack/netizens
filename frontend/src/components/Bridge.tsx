@@ -151,13 +151,14 @@ export function Bridge() {
         const data = encodeFunctionData({ abi: wcnAbi, functionName: 'setApprovalForAll', args: [BRIDGE_L2_ADDRESS, true] });
         const hash = await walletClient.writeContract({
           address: OPTIMISM_PORTAL_ADDRESS, abi: optimismPortalAbi, functionName: 'depositTransaction',
-          args: [WCN_ADDRESS, 0n, 120_000n, false, data], value: 0n,
+          args: [WCN_ADDRESS, 0n, 156_000n, false, data], value: 0n,
         });
-        if (await settled(hash, 'Approval')) {
-          if (job) patchJob(job.id, { approveHash: hash });
-          else addJob(newJob({ account: address, recipient: address, approveHash: hash }));
-          addToast('success', 'Approval confirmed on Ethereum');
-        }
+        // Persist the deposit hash on submit, so a refresh during the L1->L2 wait keeps tracking it.
+        const j = job ?? newJob({ account: address, recipient: address });
+        if (job) patchJob(j.id, { approveHash: hash });
+        else addJob({ ...j, approveHash: hash });
+        if (await settled(hash, 'Approval')) addToast('success', 'Approval confirmed on Ethereum');
+        else patchJob(j.id, { approveHash: undefined }); // reverted on L1 -> keep it retryable
       } else if (key.startsWith('bridge:')) {
         const ref = key.slice('bridge:'.length);
         let j = job;
@@ -173,33 +174,36 @@ export function Bridge() {
         const ids = batch.tokenIds.map((t) => BigInt(t));
         const eth = BigInt(batch.ethAmount);
         const data = encodeFunctionData({ abi: bridgeL2Abi, functionName: 'bridge', args: [ids, address] });
-        // Real bridge() L2 cost ~139k + ~14.4k/token; pad but never exceed MegaETH's 1M cap.
-        const need = 180_000n + 18_000n * BigInt(ids.length);
+        // Real bridge() L2 cost ~139k + ~14.4k/token; widened ~30% for MegaETH metering, capped at its 1M deposit limit.
+        const need = 234_000n + 24_000n * BigInt(ids.length);
         const gas = need > 1_000_000n ? 1_000_000n : need;
         const hash = await walletClient.writeContract({
           address: OPTIMISM_PORTAL_ADDRESS, abi: optimismPortalAbi, functionName: 'depositTransaction',
           args: [BRIDGE_L2_ADDRESS, eth, gas, false, data], value: 0n,
         });
+        // Persist on submit so a refresh during the L1->L2 wait keeps tracking it.
+        const updated = { ...batch, bridgeHash: hash };
+        const batches = preview ? [...j.batches, updated] : j.batches.map((x) => (x.index === batch.index ? updated : x));
+        patchJob(j.id, { batches });
         if (await settled(hash, `Batch ${batch.index + 1} start`)) {
-          const updated = { ...batch, bridgeHash: hash };
-          const batches = preview ? [...j.batches, updated] : j.batches.map((x) => (x.index === batch.index ? updated : x));
-          patchJob(j.id, { batches });
           addToast('success', `Batch ${batch.index + 1} force-included on Ethereum`);
+        } else {
+          // reverted on L1 -> undo so it stays retryable
+          const reverted = preview ? j.batches : batches.map((x) => (x.index === batch.index ? { ...batch, bridgeHash: undefined } : x));
+          patchJob(j.id, { batches: reverted });
         }
       } else if (key.startsWith('prove:') && job) {
         const i = Number(key.slice('prove:'.length));
         const hash = await proveBatch(job, i, walletClient);
-        if (await settled(hash, `Batch ${i + 1} prove`)) {
-          patchJob(job.id, { batches: job.batches.map((x) => (x.index === i ? { ...x, proveHash: hash } : x)) });
-          addToast('success', `Batch ${i + 1} proved on Ethereum`);
-        }
+        // Persist on submit; a reverted prove hash is dropped by refreshJobStatus, staying retryable.
+        patchJob(job.id, { batches: job.batches.map((x) => (x.index === i ? { ...x, proveHash: hash } : x)) });
+        if (await settled(hash, `Batch ${i + 1} prove`)) addToast('success', `Batch ${i + 1} proved on Ethereum`);
       } else if (key.startsWith('finalize:') && job) {
         const i = Number(key.slice('finalize:'.length));
         const hash = await finalizeBatch(job, i, walletClient);
-        if (await settled(hash, `Batch ${i + 1} finalize`)) {
-          patchJob(job.id, { batches: job.batches.map((x) => (x.index === i ? { ...x, finalizeHash: hash } : x)) });
-          addToast('success', `Batch ${i + 1} finalized — coming home`);
-        }
+        // Persist on submit; a reverted finalize hash is dropped by refreshJobStatus, staying retryable.
+        patchJob(job.id, { batches: job.batches.map((x) => (x.index === i ? { ...x, finalizeHash: hash } : x)) });
+        if (await settled(hash, `Batch ${i + 1} finalize`)) addToast('success', `Batch ${i + 1} finalized — coming home`);
       }
     } catch (e) {
       if (hasUserRejection(e)) addToast('error', 'Rejected in wallet');
