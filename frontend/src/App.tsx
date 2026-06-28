@@ -39,7 +39,7 @@ function App() {
 
         <div className="app-content__row">
           <article className="app-content__section">
-            Bring your World Computer Netizens and Ether home from the perfidious rabbitchain to Ethereum, the real World Computer. This application broadcasts everything using the canonical bridge to avoid giving any gas fees to the trustful L2. Netizens burn on L2 and mint on Ethereum; the full trip takes over a week (the challenge window), so this page remembers where each of your Netizens is and tells you exactly when to prove and finalize. The contracts are public and verifiable: <ContractLink label="NetizenL1" explorer={L1_EXPLORER} address={NETIZEN_L1_ADDRESS} /> on L1 and <ContractLink label="NetizenBridgeL2" explorer={L2_EXPLORER} address={BRIDGE_L2_ADDRESS} /> on L2.
+            Bring your World Computer Netizens and Ether home from the perfidious rabbitchain to Ethereum, the real World Computer. This application broadcasts everything using the canonical bridge to avoid giving any gas fees to the trustful L2. Netizens burn on L2 and mint on Ethereum; the full trip takes over a week (the challenge window), so this page remembers where each of your Netizens is and tells you exactly when to prove and finalize. The contracts are public and verifiable: <ContractLink label="NetizenL1" explorer={L1_EXPLORER} address={NETIZEN_L1_ADDRESS} /> on L1 and <ContractLink label="NetizenBridgeL2" explorer={L2_EXPLORER} address={BRIDGE_L2_ADDRESS} /> on L2. The source for this site is available <a href="https://github.com/unattended-backpack/netizens" target="_blank" rel="noopener noreferrer">here</a>.
           </article>
         </div>
 
