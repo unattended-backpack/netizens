@@ -137,7 +137,7 @@ function startedView(b: Batch, index: number, ref: string, nowSec: number): Batc
   if (!d?.bridgeL2) prove = { status: 'locked', detail: 'Unlocks once this batch lands on L2.' };
   else if (proven) prove = { status: 'done', detail: 'Proven on Ethereum.', hash: b.proveHash };
   else if (wd === 'ready-to-prove') prove = { status: b.proveHash ? 'pending' : 'active', detail: b.proveHash ? 'Proving…' : 'Submit the proof.', hash: b.proveHash };
-  else prove = { status: 'waiting', detail: `Waiting for a state root ${countdown(d?.proveAtUnix, nowSec, '(short wait)')}` };
+  else prove = { status: 'waiting', detail: `Waiting for a state root ${countdown(d?.proveAtUnix, nowSec, '')}`.trim() };
 
   let finalize: StepView;
   if (!proven) finalize = { status: 'locked', detail: 'Unlocks after proving.' };
