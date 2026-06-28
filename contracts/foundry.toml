@@ -1,0 +1,25 @@
+[profile.default]
+src = "src"
+out = "out"
+test = "test"
+script = "script"
+libs = ["dependencies"]
+solc = "0.8.35"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+remappings = [
+    "solady/=dependencies/solady-0.1.26/src/",
+    "forge-std/=dependencies/forge-std-1.9.7/src/",
+]
+
+# Soldeer-managed dependencies (no npm). `forge soldeer install` reconciles these
+# against soldeer.lock; the install dir (dependencies/) is gitignored.
+[dependencies]
+forge-std = "1.9.7"
+solady = "0.1.26"
+
+# Remappings live in [profile.default] above as the single source of truth; don't
+# let `forge soldeer install` generate a redundant (non-matching) remappings.txt.
+[soldeer]
+remappings_generate = false

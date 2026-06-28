@@ -1,0 +1,225 @@
+.connect-button-wrapper {
+  position: relative;
+}
+
+.connect-button {
+  display: inline-block;
+  padding: 0 2ch;
+  background: var(--theme-button);
+  border: 0;
+  color: var(--theme-button-text);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size);
+  font-weight: 400;
+  line-height: calc(var(--theme-line-height-base) * 2em);
+  min-height: calc(var(--theme-line-height-base) * 2rem);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: 200ms ease background;
+}
+
+.connect-button:hover:not(:disabled) {
+  background: var(--theme-focused-foreground);
+}
+
+.connect-button:focus {
+  background: var(--theme-focused-foreground);
+  outline: 0;
+}
+
+.connect-button:disabled {
+  background: var(--theme-button-background);
+  color: var(--theme-text);
+}
+
+.connect-button--connecting {
+  background: var(--theme-button-background);
+  color: var(--theme-button-foreground);
+}
+
+.connect-button--connected {
+  background: var(--theme-button);
+  color: var(--theme-button-text);
+}
+
+.connect-button--connected:hover {
+  background: var(--theme-focused-foreground);
+}
+
+.connect-button__address {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size);
+}
+
+.connect-button__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-page-dropdown-menus);
+}
+
+.connect-button__menu {
+  position: absolute;
+  top: calc(100% + calc(var(--theme-line-height-base) * 0.5rem));
+  right: 0;
+  min-width: 24ch;
+  background: var(--theme-background-modal);
+  border: 2px solid var(--theme-border);
+  padding: calc(var(--theme-line-height-base) * 0.5rem);
+  z-index: var(--z-index-page-dropdown-menus);
+}
+
+.connect-button__menu-address {
+  padding: calc(var(--theme-line-height-base) * 0.5rem) 1ch;
+  border-bottom: 2px solid var(--theme-border);
+  margin-bottom: calc(var(--theme-line-height-base) * 0.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--theme-line-height-base) * 0.25rem);
+}
+
+.connect-button__menu-ens {
+  font-weight: 400;
+  color: var(--theme-text);
+}
+
+.connect-button__menu-hex {
+  font-family: var(--font-family-mono);
+  font-size: calc(var(--font-size) * 0.875);
+  color: var(--theme-text-subdued);
+}
+
+.connect-button__menu-item {
+  display: block;
+  width: 100%;
+  padding: calc(var(--theme-line-height-base) * 0.5rem) 2ch;
+  background: var(--theme-button);
+  border: none;
+  color: var(--theme-button-text);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 200ms ease background;
+}
+
+.connect-button__menu-item:hover {
+  background: var(--theme-focused-foreground);
+}
+
+.connect-button__menu-item--disconnect {
+  background: var(--theme-negative);
+  color: var(--theme-button-text);
+}
+
+.connect-button__menu-item--disconnect:hover {
+  background: var(--theme-focused-foreground);
+}
+
+/* Modal styles */
+.connect-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--theme-overlay);
+  backdrop-filter: blur(1px);
+  z-index: var(--z-index-page-modals);
+}
+
+.connect-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 30ch;
+  background: var(--theme-background-modal);
+  border: 2px solid var(--theme-border);
+  padding: calc(var(--theme-line-height-base) * 1.5rem);
+  z-index: calc(var(--z-index-page-modals) + 1);
+}
+
+.connect-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: calc(var(--theme-line-height-base) * 1rem);
+  padding-bottom: calc(var(--theme-line-height-base) * 0.5rem);
+  border-bottom: 2px solid var(--theme-border);
+}
+
+.connect-modal__title {
+  margin: 0;
+  font-size: var(--font-size);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-text);
+}
+
+.connect-modal__close {
+  background: transparent;
+  border: none;
+  color: var(--theme-text-subdued);
+  font-size: calc(var(--font-size) * 1.25);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.5ch;
+  transition: 200ms ease color;
+}
+
+.connect-modal__close:hover {
+  color: var(--theme-text);
+}
+
+.connect-modal__options {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--theme-line-height-base) * 0.5rem);
+}
+
+.connect-modal__option {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--theme-line-height-base) * 0.25rem);
+  padding: calc(var(--theme-line-height-base) * 0.75rem) 2ch;
+  background: var(--theme-button);
+  border: none;
+  color: var(--theme-button-text);
+  text-align: left;
+  cursor: pointer;
+  transition: 200ms ease background;
+}
+
+.connect-modal__option:hover {
+  background: var(--theme-focused-foreground);
+}
+
+.connect-modal__option-name {
+  font-size: var(--font-size);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: inherit;
+}
+
+.connect-modal__option-desc {
+  font-size: calc(var(--font-size) * 0.875);
+  color: inherit;
+  opacity: 0.7;
+}
+
+@media (max-width: 780px) {
+  .connect-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .connect-button__menu {
+    left: 0;
+    right: 0;
+    min-width: auto;
+  }
+}

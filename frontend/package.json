@@ -1,0 +1,31 @@
+{
+  "name": "netizen-bridge-frontend",
+  "private": true,
+  "type": "module",
+  "license": "LicenseRef-VPL WITH AGPL-3.0-only",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@metamask/sdk": "^0.33.1",
+    "@rainbow-me/rainbowkit": "^2.2.10",
+    "@tanstack/react-query": "latest",
+    "@tanstack/react-query-devtools": "^5.91.2",
+    "@walletconnect/ethereum-provider": "^2.23.1",
+    "react": "latest",
+    "react-dom": "latest",
+    "tone": "^15.1.22",
+    "viem": "latest",
+    "wagmi": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "@wagmi/cli": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}

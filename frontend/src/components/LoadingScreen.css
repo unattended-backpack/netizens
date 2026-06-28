@@ -1,0 +1,32 @@
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-background);
+}
+
+.loading-screen__logo {
+  width: 90vmin;
+  height: 90vmin;
+  object-fit: contain;
+  animation: loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen__logo {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,16 @@
+.fast-forward {
+  min-height: calc(var(--theme-line-height-base) * 2rem); /* match the wallet button */
+  padding: 0 1.5ch;
+  background: transparent;
+  color: var(--theme-text-subdued);
+  border: 1px dashed var(--theme-border);
+  font-size: var(--font-size);
+  line-height: 1;
+  cursor: pointer;
+  transition: 200ms ease color, 200ms ease border-color;
+}
+.fast-forward:hover:not(:disabled) {
+  color: var(--theme-text);
+  border-color: var(--theme-text-subdued);
+}
+.fast-forward:disabled { opacity: 0.5; cursor: not-allowed; }

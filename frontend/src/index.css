@@ -1,0 +1,428 @@
+/* SRCL Font - GeistMono */
+@font-face {
+  font-family: 'GeistMono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/996b00fb-4b7a-403d-8da2-ce2225450681.woff2') format('woff2');
+}
+
+/* CSS Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Color Palette - Sigil Theme */
+html,
+body {
+  /* Madness Black */
+  --color-black: rgba(36, 32, 30, 1);
+  --color-black-40: rgba(36, 32, 30, 0.4);
+  --color-black-80: rgba(36, 32, 30, 0.8);
+
+  /* Gray scale */
+  --color-gray-60: rgba(80, 72, 65, 1);
+  --color-gray-70: rgba(60, 54, 48, 1);
+  --color-gray-70-30: rgba(60, 54, 48, 0.3);
+  --color-gray-80: rgba(48, 43, 38, 1);
+  --color-gray-90: rgba(42, 38, 34, 1);
+
+  /* Bone White */
+  --color-bone: rgba(250, 235, 210, 1);
+  --color-bone-10: rgba(250, 235, 210, 0.1);
+  --color-bone-40: rgba(250, 235, 210, 0.4);
+
+  /* Sigil Red */
+  --color-red: rgba(237, 28, 36, 1);
+  --color-red-20: rgba(237, 28, 36, 0.2);
+  --color-red-30: rgba(237, 28, 36, 0.3);
+  --color-red-40: rgba(237, 28, 36, 0.4);
+
+  /* Gold */
+  --color-gold: rgba(251, 176, 64, 1);
+  --color-gold-30: rgba(251, 176, 64, 0.3);
+
+  /* Font families */
+  --font-family: -apple-system, BlinkMacSystemFont, helvetica neue, helvetica, sans-serif;
+  --font-family-mono: 'GeistMono-Regular', Consolas, monaco, monospace;
+
+  /* Typography */
+  --font-size: 16px;
+  --theme-line-height-base: 1.25;
+
+  /* Standard spacing unit — page rhythm, box padding, and box header/content gaps. */
+  --space: calc(var(--theme-line-height-base) * 1rem);
+
+  /* Z-index scale */
+  --z-index-page: 1;
+  --z-index-page-select: 3;
+  --z-index-page-tooltips: 4;
+  --z-index-page-popover: 5;
+  --z-index-page-dropdown-menus: 6;
+  --z-index-page-modals: 10;
+
+  /* Dark theme (default) */
+  --theme-overlay: var(--color-black-40);
+  --theme-background: var(--color-black);
+  --theme-background-modal: var(--color-gray-80);
+  --theme-background-modal-footer: var(--color-gray-70);
+  --theme-background-input: var(--color-gray-60);
+  --theme-border: var(--color-bone-40);
+  --theme-border-subdued: var(--color-gray-70-30);
+  --theme-text: var(--color-bone);
+  --theme-text-subdued: var(--color-bone);
+  --theme-button: var(--color-bone);
+  --theme-button-text: var(--color-black);
+  --theme-button-foreground: var(--color-gray-90);
+  --theme-button-background: var(--color-gray-80);
+  --theme-focused-foreground: var(--color-red-40);
+  --theme-focused-foreground-subdued: var(--color-red-20);
+  --theme-positive: var(--color-gold);
+  --theme-positive-subdued: var(--color-gold-30);
+  --theme-negative: var(--color-red);
+  --theme-negative-subdued: var(--color-red-20);
+  --theme-negative-background: var(--color-red-30);
+  --theme-stripe: var(--color-bone-10);
+  --theme-background-blur: var(--color-black-80);
+  --theme-text-placeholder: var(--color-bone-40);
+
+  /* Apply base styles */
+  background: var(--theme-background);
+  color: var(--theme-text);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size);
+  line-height: calc(var(--theme-line-height-base) * 1rem);
+  font-optical-sizing: auto;
+  text-rendering: geometricPrecision;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Scrollbar styling */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  background: transparent;
+  height: calc(var(--theme-line-height-base) * 1rem);
+  width: 1ch;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: var(--theme-background);
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: var(--theme-border);
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-text-subdued);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Background logo styles */
+.background-logo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vmin;
+  height: 90vmin;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.2;
+}
+
+.background-logo path {
+  transition: fill 200ms ease-out;
+}
+
+/* Link styling */
+a {
+  background: none;
+  color: var(--theme-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  color: var(--theme-text);
+  text-decoration: underline;
+}
+
+a:focus {
+  color: var(--theme-text);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--theme-focused-foreground, #E4B948);
+  outline-offset: 2px;
+}
+
+/* Block elements */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+/* Form elements */
+input,
+textarea,
+select {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size);
+  line-height: calc(var(--theme-line-height-base) * 1em);
+  color: var(--theme-text);
+  background: var(--theme-background-input);
+  border: 0;
+  box-shadow: inset 0 0 0 2px var(--theme-border);
+  padding: calc(var(--theme-line-height-base) * 0.5rem) 1ch;
+  outline: none;
+  transition: 200ms ease box-shadow, 200ms ease background;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: inset 0 0 0 2px var(--theme-focused-foreground);
+  background: var(--theme-background);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background: var(--theme-button-background);
+  color: var(--theme-text);
+  cursor: not-allowed;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--theme-text-placeholder);
+  font-style: normal;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1ch center;
+  padding-right: 3ch;
+}
+
+select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ef6300' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+}
+
+/* Button base */
+button {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Layout classes */
+.app-content {
+  max-width: 1260px;
+  margin: 0 auto;
+  /* Equal padding all around — top matches the left/right page gutter. */
+  padding: calc(var(--theme-line-height-base) * 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+  position: relative;
+  z-index: 1;
+}
+
+.app-content__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--theme-line-height-base) * 1rem);
+  width: 100%;
+  max-width: 100%;
+  padding-bottom: calc(var(--theme-line-height-base) * 1rem);
+  border-bottom: 2px solid var(--theme-border);
+}
+
+.app-content__brand {
+  display: flex;
+  align-items: center;
+  gap: 2ch;
+}
+
+.app-content__actions {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+@media (max-width: 780px) {
+  .app-content__actions .connect-button-wrapper { flex: 1; }
+}
+
+.app-content__logo {
+  height: calc(var(--theme-line-height-base) * 2rem); /* match the wallet button height */
+  width: auto;
+}
+
+.app-content__title {
+  font-size: calc(var(--font-size) * 2.5);
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap; /* never wrap "NETIZENS COME HOME" */
+}
+
+.app-content__subtitle {
+  font-size: calc(var(--font-size) * 1);
+  font-weight: 400;
+  color: var(--theme-text-subdued);
+}
+
+.app-content__status {
+  font-size: 1rem;
+  font-weight: 400;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.app-content__section {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.app-content__row {
+  display: flex;
+  gap: calc(var(--theme-line-height-base) * 1.5rem);
+  width: 100%;
+  max-width: 100%;
+}
+
+.app-content__section--third {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-content__section--half {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-content__section--bid-form {
+  min-height: calc(var(--theme-line-height-base) * 22rem);
+}
+
+.app-content__section--owned-bids {
+  position: relative;
+  overflow: hidden;
+}
+
+.app-content__section--two-thirds {
+  flex: 2;
+  min-width: 0;
+}
+
+.app-content__auction-state {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.app-content__bid-display {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Responsive styles */
+/* A SINGLE header break: at <=780px the wallet button drops below the brand AND the
+   layout switches to compact sizing — all at once, placed right where the desktop
+   row would otherwise run out of room (no premature break, no awkward in-between). */
+@media (max-width: 780px) {
+  .app-content {
+    padding: calc(var(--theme-line-height-base) * 1rem);
+    gap: var(--space);
+  }
+
+  .app-content__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space);
+  }
+
+  .app-content__brand {
+    justify-content: flex-start;
+  }
+
+  .app-content__title {
+    font-size: calc(var(--font-size) * 1.5);
+  }
+
+  .app-content__row {
+    flex-direction: column;
+    gap: var(--space);
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Tabular numbers for consistent digit width */
+.numeric-value,
+[data-numeric] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Accessible focus states */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--theme-focused-foreground, #E4B948);
+  outline-offset: 2px;
+}
+
+/* Screen reader only utility */
+.visually-hidden,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

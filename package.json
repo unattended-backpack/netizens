@@ -1,0 +1,13 @@
+{
+  "name": "netizen-bridge",
+  "version": "1.0.0",
+  "description": "Trustless one-directional NFT + ETH bridge moving World Computer Netizens from MegaETH (L2) to Ethereum (L1) over the canonical OP-Stack bridge.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tim Clancy <tim-clancy.eth>",
+  "license": "LicenseRef-VPL WITH AGPL-3.0-only",
+  "dependencies": {
+    "viem": "^2.51.3"
+  }
+}

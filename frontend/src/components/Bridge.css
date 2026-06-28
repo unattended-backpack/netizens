@@ -1,0 +1,161 @@
+.bridge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+  width: 100%;
+}
+
+.bridge__hint {
+  color: var(--theme-text-subdued);
+  font-size: var(--font-size);
+}
+.bridge__hint--err { color: var(--theme-negative); }
+
+.bridge__panel {
+  --panel-pad: var(--space);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+  padding: var(--space);
+  background: var(--theme-background-blur);
+  backdrop-filter: blur(5px);
+  box-shadow: inset 0 0 0 2px var(--theme-border);
+  box-sizing: border-box;
+}
+
+.bridge__panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2ch;
+}
+.bridge__panel-title {
+  font-size: var(--font-size);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-text-subdued);
+}
+.bridge__counts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0.5ch 2ch;
+  font-size: 13px;
+}
+.bridge__count--risk { color: var(--color-red); }
+.bridge__count--mid { color: var(--theme-text); }
+.bridge__count--home { color: var(--color-gold); }
+
+.bridge__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 1ch;
+  height: 360px; /* fixed so the panel never resizes as holdings load */
+  overflow-y: auto;
+  contain: paint; /* isolate scroll painting from the backdrop-filter panel */
+  /* Near-full-bleed: stop 2px short of the panel edge so the bounding-box border
+     stays visible, with the scrollbar just inside it. Cards stay inset via padding. */
+  margin-right: calc(2px - var(--panel-pad));
+  padding-right: var(--panel-pad);
+  /* Sacred Computer scrollbar — matches the page-level SRCL scrollbar. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-border) var(--theme-background);
+}
+.bridge__grid::-webkit-scrollbar { background: transparent; width: 1ch; height: calc(var(--theme-line-height-base) * 1rem); }
+.bridge__grid::-webkit-scrollbar-track { background: var(--theme-background); }
+.bridge__grid::-webkit-scrollbar-thumb { background: var(--theme-border); }
+.bridge__grid::-webkit-scrollbar-thumb:hover { background: var(--theme-text-subdued); }
+
+.netizen {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--theme-line-height-base) * 0.25rem);
+  padding: 0;
+  background: var(--theme-background-input);
+  box-shadow: inset 0 0 0 2px var(--theme-border);
+  /* Skip painting/decoding off-screen cards entirely — the big scroll-perf win. */
+  content-visibility: auto;
+  contain-intrinsic-size: 72px 92px;
+}
+/* Red = still on MegaETH (at risk); white = burned + bridging; gold = home on Ethereum. */
+.netizen--risk { box-shadow: inset 0 0 0 2px var(--color-red); }
+.netizen--bridging { box-shadow: inset 0 0 0 2px var(--theme-text); }
+.netizen--home { box-shadow: inset 0 0 0 2px var(--color-gold); }
+.netizen__img {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--theme-background);
+}
+.netizen__img img { width: 100%; height: 100%; object-fit: cover; }
+.netizen__ph { color: var(--theme-text-subdued); font-size: var(--font-size); }
+.netizen__id { font-size: 12px; padding: 0 1ch calc(var(--theme-line-height-base) * 0.25rem); color: var(--theme-text); }
+
+/* Reserves the gallery's height for message states so the panel never resizes. */
+.bridge__placeholder {
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Reserves the wizard's height so it stays constant between message/active states. */
+.bridge__wbody {
+  min-height: 15rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
+
+/* Localnet-only dev control. */
+.bridge__ff {
+  margin-top: auto;
+  align-self: flex-start;
+  background: transparent;
+  color: var(--theme-text-subdued);
+  border: 1px dashed var(--theme-border);
+  padding: calc(var(--theme-line-height-base) * 0.4rem) 1.5ch;
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.bridge__ff:hover:not(:disabled) { color: var(--theme-text); border-color: var(--theme-text-subdued); }
+.bridge__ff:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.bridge__steps {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--theme-line-height-base) * 0.5rem);
+  padding-left: 2ch;
+  color: var(--theme-text);
+  font-size: var(--font-size);
+}
+.bridge__steps ul { padding-left: 2ch; margin-top: calc(var(--theme-line-height-base) * 0.25rem); }
+
+.bridge__go {
+  min-height: 44px;
+  padding: 0 3ch;
+  background: var(--theme-button);
+  color: var(--theme-button-text);
+  border: none;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 200ms ease background, 200ms ease opacity;
+  cursor: pointer;
+}
+.bridge__go:hover:not(:disabled) { background: var(--theme-positive); }
+.bridge__go:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.bridge__jobs { display: flex; flex-direction: column; gap: 1rem; }
+
+@media (max-width: 600px) {
+  .bridge__grid { grid-template-columns: repeat(4, 1fr); }
+}
