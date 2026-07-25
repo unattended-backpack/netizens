@@ -78,6 +78,12 @@ export const l1Chain = L1_CHAIN_ID === mainnet.id
 export const WCN_DEPLOY_BLOCK = BigInt(envStr('VITE_WCN_DEPLOY_BLOCK', '0'));
 /** Lower bound for scanning NetizenL1 (the L1 mirror) mint logs — the "home" holdings. */
 export const NETIZEN_L1_DEPLOY_BLOCK = BigInt(envStr('VITE_NETIZEN_L1_DEPLOY_BLOCK', '0'));
+/** Max block span per L1 eth_getLogs. Some RPCs (e.g. QuickNode) cap ~10k blocks and 413 above
+ *  it, so the home scan is chunked into windows this size. */
+export const L1_LOG_CHUNK = BigInt(envStr('VITE_L1_LOG_CHUNK', '9000'));
+/** Max block span per L2 eth_getLogs. MegaETH serves wide ranges, so this is large — chunking
+ *  mainly bounds the first full-history pass; incremental deltas are tiny. */
+export const L2_LOG_CHUNK = BigInt(envStr('VITE_L2_LOG_CHUNK', '5000000'));
 
 /**
  * Tokens per force-inclusion deposit. MegaETH caps a deposit at 1,000,000 L2 gas and
