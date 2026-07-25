@@ -3,7 +3,7 @@ import { parseAbiItem } from 'viem';
 import { getWithdrawals, getL2TransactionHashes, walletActionsL1 } from 'viem/op-stack';
 import { l1Public, l2Public } from './clients';
 import {
-  megaeth, DISPUTE_GAME_FACTORY, KAILUA_GAME_TYPE,
+  megaeth, DISPUTE_GAME_FACTORY, KAILUA_GAME_TYPE, OPTIMISM_PORTAL_ADDRESS,
   WCN_ADDRESS, BRIDGE_L2_ADDRESS, wcnAbi,
   WCN_DEPLOY_BLOCK, IS_LOCALNET,
 } from '../constants/bridge';
@@ -20,7 +20,21 @@ const factoryAbi = [
 const gameAbi = [
   { type: 'function', name: 'l2BlockNumber', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
   { type: 'function', name: 'rootClaim', stateMutability: 'view', inputs: [], outputs: [{ type: 'bytes32' }] },
+  { type: 'function', name: 'status', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint8' }] },
+  { type: 'function', name: 'resolvedAt', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint64' }] },
+  { type: 'function', name: 'createdAt', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint64' }] },
 ] as const;
+
+// OptimismPortal2 reads. viem's getWithdrawalStatus/getTimeTo* can't decode the Kailua dispute
+// factory's non-standard ABI (they throw), so we derive withdrawal state from the portal directly.
+const portalAbi = [
+  { type: 'function', name: 'finalizedWithdrawals', stateMutability: 'view', inputs: [{ type: 'bytes32' }], outputs: [{ type: 'bool' }] },
+  { type: 'function', name: 'provenWithdrawals', stateMutability: 'view', inputs: [{ type: 'bytes32' }, { type: 'address' }], outputs: [{ type: 'address' }, { type: 'uint64' }] },
+  { type: 'function', name: 'proofMaturityDelaySeconds', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'disputeGameFinalityDelaySeconds', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+] as const;
+
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000' as const;
 
 /** Newest Kailua (gameType 1337) game whose root covers the withdrawal's L2 block. */
 async function findOutput(withdrawalL2Block: bigint) {
@@ -62,6 +76,64 @@ async function findL2BridgeTx(owner: Address, b: Batch): Promise<Hash | undefine
   }
 }
 
+/**
+ * Derive the withdrawal lifecycle for a landed L2 bridge, Kailua-correctly (viem's
+ * getWithdrawalStatus throws on the Kailua factory's ABI). Prove-readiness comes from whether a
+ * covering output root exists (findOutput); finalize-readiness from the portal's proven/finalized
+ * state plus the proof-maturity + dispute-game-finality delays and the game's resolution.
+ */
+async function deriveWithdrawal(
+  account: Address,
+  l2r: Awaited<ReturnType<typeof l2Public.getTransactionReceipt>>,
+): Promise<Partial<BatchDerived>> {
+  const [withdrawal] = getWithdrawals(l2r);
+  if (!withdrawal) return {};
+  const wHash = withdrawal.withdrawalHash;
+  const nowSec = Math.floor(Date.now() / 1000);
+
+  const finalized = await l1Public
+    .readContract({ address: OPTIMISM_PORTAL_ADDRESS, abi: portalAbi, functionName: 'finalizedWithdrawals', args: [wHash] })
+    .catch(() => false);
+  if (finalized) return { withdrawal: 'finalized' };
+
+  const proven = await l1Public
+    .readContract({ address: OPTIMISM_PORTAL_ADDRESS, abi: portalAbi, functionName: 'provenWithdrawals', args: [wHash, account] })
+    .catch(() => null);
+  const provenAt = proven ? Number(proven[1]) : 0;
+  const gameProxy = proven ? proven[0] : ZERO_ADDR;
+
+  if (provenAt > 0 && gameProxy.toLowerCase() !== ZERO_ADDR) {
+    const [proofDelay, gameDelay] = await Promise.all([
+      l1Public.readContract({ address: OPTIMISM_PORTAL_ADDRESS, abi: portalAbi, functionName: 'proofMaturityDelaySeconds' }).catch(() => 0n),
+      l1Public.readContract({ address: OPTIMISM_PORTAL_ADDRESS, abi: portalAbi, functionName: 'disputeGameFinalityDelaySeconds' }).catch(() => 0n),
+    ]);
+    const [status, resolvedAt, createdAt] = await Promise.all([
+      l1Public.readContract({ address: gameProxy, abi: gameAbi, functionName: 'status' }).catch(() => 0),
+      l1Public.readContract({ address: gameProxy, abi: gameAbi, functionName: 'resolvedAt' }).catch(() => 0n),
+      l1Public.readContract({ address: gameProxy, abi: gameAbi, functionName: 'createdAt' }).catch(() => 0n),
+    ]);
+    const resolved = Number(status) === 2; // GameStatus.DEFENDER_WINS
+    // Finalizable once the proof has matured AND the game has resolved AND its air-gap has passed.
+    // Surface ONE cumulative ETA (not a 7d proof-maturity timer that then resets to a fresh 3.5d
+    // air-gap timer): take the max of the proof-maturity deadline and the game-resolution air-gap.
+    // Before the game resolves, estimate its resolution as createdAt + the proof-maturity window
+    // (the Kailua game window matches it on this chain); once resolved, use the exact resolvedAt
+    // (near-identical, so the countdown doesn't jump).
+    const resolveAt = resolved ? Number(resolvedAt) : Number(createdAt) + Number(proofDelay);
+    const finalizeAt = Math.max(provenAt + Number(proofDelay), resolveAt + Number(gameDelay));
+    if (resolved && nowSec >= finalizeAt) return { withdrawal: 'ready-to-finalize' };
+    return { withdrawal: 'waiting-to-finalize', finalizeAtUnix: finalizeAt };
+  }
+
+  // Not yet proven: provable as soon as an output root covers the withdrawal's L2 block.
+  try {
+    await findOutput(l2r.blockNumber!);
+    return { withdrawal: 'ready-to-prove' };
+  } catch {
+    return { withdrawal: 'waiting-to-prove' };
+  }
+}
+
 /** Recompute the chain-derived progress of one batch. */
 async function refreshBatch(account: Address, b: Batch): Promise<Batch> {
   const d: BatchDerived = { bridgeL1: false, bridgeL2: false };
@@ -85,23 +157,7 @@ async function refreshBatch(account: Address, b: Batch): Promise<Batch> {
     const l2r = await l2Public.getTransactionReceipt({ hash: l2TxHash }).catch(() => null);
     if (l2r && l2r.status === 'success') {
       d.bridgeL2 = true;
-      const st = await l1Public.getWithdrawalStatus({ receipt: l2r, targetChain: megaeth } as never).catch(() => null);
-      if (st) {
-        d.withdrawal = st as BatchDerived['withdrawal'];
-        const nowSec = Math.floor(Date.now() / 1000);
-        if (st === 'waiting-to-prove') {
-          try {
-            const t = await l1Public.getTimeToProve({ receipt: l2r, targetChain: megaeth } as never);
-            if (t?.seconds != null) d.proveAtUnix = nowSec + Number(t.seconds);
-          } catch { /* no estimate for Kailua */ }
-        } else if (st === 'waiting-to-finalize') {
-          try {
-            const [w] = getWithdrawals(l2r);
-            const t = await l1Public.getTimeToFinalize({ withdrawalHash: w.withdrawalHash, targetChain: megaeth } as never);
-            if (t?.seconds != null) d.finalizeAtUnix = nowSec + Number(t.seconds);
-          } catch { /* ignore */ }
-        }
-      }
+      Object.assign(d, await deriveWithdrawal(account, l2r).catch(() => ({})));
     } else if (l2r) {
       d.bridgeReverted = true;
     }
